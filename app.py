@@ -83,6 +83,6 @@ if st.button("제출"):
     if name and job and phone:
         add_entry(name, job, phone)
         st.success("제출이 완료되었습니다!")
-        st.experimental_rerun()
+        st.rerun()
     else:
         st.warning("모든 항목을 입력해주세요.")
