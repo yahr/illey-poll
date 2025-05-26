@@ -62,12 +62,22 @@ st.title("제일광고기획 거래처 관리")
 rows = get_entries()
 if rows:
     st.subheader("현재까지 접수된 내역")
-    df = pd.DataFrame(rows, columns=["id", "업체명", "업종", "연락처"])
-    st.table(df.drop(columns=["id"]))
-    for i, row in df.iterrows():
-        if st.button("삭제", key=f"delete_{row['id']}"):
-            delete_entry(row["id"])
-            st.success(f"{row['업체명']} 데이터가 삭제되었습니다.")
+    # 표 헤더
+    col1, col2, col3, col4 = st.columns([3, 3, 3, 1])
+    col1.markdown("**업체명**")
+    col2.markdown("**업종**")
+    col3.markdown("**연락처**")
+    col4.markdown("**삭제**")
+    # 데이터 행
+    for row in rows:
+        id_, name, job, phone = row
+        col1, col2, col3, col4 = st.columns([3, 3, 3, 1])
+        col1.write(name)
+        col2.write(job)
+        col3.write(phone if phone else "-")
+        if col4.button("삭제", key=f"delete_{id_}"):
+            delete_entry(id_)
+            st.success(f"{name} 데이터가 삭제되었습니다.")
             st.rerun()
 else:
     st.info("아직 접수된 내역이 없습니다.")
