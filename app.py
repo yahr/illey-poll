@@ -87,9 +87,9 @@ job = st.text_input("업종(혹은 무슨일)")
 phone = st.text_input("연락처")
 
 if st.button("제출"):
-    if name and job and phone:
+    if name and job:
         add_entry(name, job, phone)
         st.success("제출이 완료되었습니다!")
         st.rerun()
     else:
-        st.warning("모든 항목을 입력해주세요.")
+        st.warning("업체명과 업종을 모두 입력해주세요.")
