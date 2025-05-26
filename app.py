@@ -17,9 +17,14 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             job TEXT NOT NULL,
+            phone TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    cur.execute("PRAGMA table_info(entries)")
+    columns = [row[1] for row in cur.fetchall()]
+    if 'phone' not in columns:
+        cur.execute("ALTER TABLE entries ADD COLUMN phone TEXT")
     conn.commit()
     cur.close()
     conn.close()
@@ -27,39 +32,56 @@ def init_db():
 def get_entries():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT name, job FROM entries ORDER BY id DESC")
+    cur.execute("SELECT id, name, job, phone FROM entries ORDER BY id DESC")
     rows = cur.fetchall()
     cur.close()
     conn.close()
     return rows
 
-def add_entry(name, job):
+def add_entry(name, job, phone):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("INSERT INTO entries (name, job) VALUES (?, ?)", (name, job))
+    cur.execute("INSERT INTO entries (name, job, phone) VALUES (?, ?, ?)", (name, job, phone))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def delete_entry(entry_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
     conn.commit()
     cur.close()
     conn.close()
 
 init_db()
 
-st.title("간단 정보 수집")
+st.title("제일광고기획 거래처 관리")
 
 # 기존 접수 내역 표시
 rows = get_entries()
 if rows:
     st.subheader("현재까지 접수된 내역")
-    df = pd.DataFrame(rows, columns=["업체명", "업종"])
-    st.table(df)
+    df = pd.DataFrame(rows, columns=["id", "업체명", "업종", "연락처"])
+    for i, row in df.iterrows():
+        col1, col2, col3, col4, col5 = st.columns([3, 3, 3, 3, 1])
+        col1.write(row["업체명"])
+        col2.write(row["업종"])
+        col3.write(row["연락처"] if row["연락처"] else "-")
+        if col5.button("삭제", key=f"delete_{row['id']}"):
+            delete_entry(row["id"])
+            st.success(f"{row['업체명']} 데이터가 삭제되었습니다.")
+            st.experimental_rerun()
 else:
     st.info("아직 접수된 내역이 없습니다.")
 
 name = st.text_input("업체명(혹은 이름)")
 job = st.text_input("업종(혹은 무슨일)")
+phone = st.text_input("연락처")
 
 if st.button("제출"):
-    if name and job:
-        add_entry(name, job)
+    if name and job and phone:
+        add_entry(name, job, phone)
         st.success("제출이 완료되었습니다!")
         st.experimental_rerun()
     else:
