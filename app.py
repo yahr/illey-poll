@@ -71,7 +71,7 @@ if rows:
         if col5.button("삭제", key=f"delete_{row['id']}"):
             delete_entry(row["id"])
             st.success(f"{row['업체명']} 데이터가 삭제되었습니다.")
-            st.experimental_rerun()
+            st.rerun()
 else:
     st.info("아직 접수된 내역이 없습니다.")
 
