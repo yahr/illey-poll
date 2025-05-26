@@ -63,6 +63,16 @@ rows = get_entries()
 if rows:
     st.subheader("현재까지 접수된 내역")
     df = pd.DataFrame(rows, columns=["id", "업체명", "업종", "연락처"])
+    # 헤더 추가 (Bootstrap 스타일 적용)
+    st.markdown(
+        '''<div class="container-fluid">
+            <div class="row" style="font-weight:bold; background:#f8f9fa; border-bottom:1px solid #dee2e6;">
+                <div class="col-3">업체명</div>
+                <div class="col-3">업종</div>
+                <div class="col-3">연락처</div>
+                <div class="col-1">삭제</div>
+            </div>
+        </div>''', unsafe_allow_html=True)
     for i, row in df.iterrows():
         col1, col2, col3, col4, col5 = st.columns([3, 3, 3, 3, 1])
         col1.write(row["업체명"])
